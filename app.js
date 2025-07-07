@@ -118,7 +118,7 @@ function updateQuests() {
   const questPanel = document.getElementById('questPanel');
   let html = '';
   for (let i = 0; i < parcours.length; i++) {
-    let quest = `Aller à <b>${parcours[i].name}</b>`;
+    let quest = parcours[i].questMessage;
     if (i < currentStep) {
       html += `<div style="color:#00aaff;opacity:0.7;text-decoration:line-through;">${quest} ✔️</div>`;
     } else if (i === currentStep) {
