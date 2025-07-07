@@ -171,6 +171,7 @@ function startAnimation() {
     });
   }, 2500);
 }
+// --- Message de fin ---
 function showIntroMessage() {
   const intro = document.createElement('div');
   intro.id = 'introMessage';
@@ -189,6 +190,33 @@ function showIntroMessage() {
   setTimeout(() => { intro.remove(); }, 4500);
 }
 startAnimation();
+function showEndMessage() {
+  const endDiv = document.createElement('div');
+  endDiv.id = 'endMessage';
+  endDiv.innerHTML = `
+    <div style="font-size:2.5em;font-weight:bold;">🎉 Bravo, tu as terminé toutes les quêtes ! 🎉</div>
+    <div style="margin-top:18px;font-size:1.3em;">Merci d’avoir exploré Nice.<br>Tu peux recommencer ou fermer la page.</div>
+  `;
+  Object.assign(endDiv.style, {
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    background: 'rgba(30,30,30,0.97)',
+    color: '#fff',
+    padding: '40px 60px',
+    borderRadius: '18px',
+    zIndex: 30000,
+    textAlign: 'center',
+    boxShadow: '0 4px 32px #000a',
+    cursor: 'pointer'
+  });
+  endDiv.onclick = () => endDiv.remove();
+  document.body.appendChild(endDiv);
+  setTimeout(() => {
+    if (document.body.contains(endDiv)) endDiv.remove();
+  }, 7000);
+}
 
 // --- Lampe torche (canvas) ---
 const lampeCanvas = document.getElementById('lampeCanvas');
@@ -273,13 +301,16 @@ document.getElementById('closeVideo').onclick = function() {
   document.getElementById('videoOverlay').style.display = 'none';
   document.getElementById('videoIframe').src = '';
   document.body.style.overflow = '';
-  // Passe à l’étape suivante ici, après la vidéo
   if (currentStep < parcours.length) {
     currentStep++;
     updateBoussoles();
     updateQuests();
+    if (currentStep === parcours.length) {
+      showEndMessage();
+    }
   }
 };
+
 
 // --- Boutons UI ---
 document.getElementById('btnRecenter').onclick = () => {
