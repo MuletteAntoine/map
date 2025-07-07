@@ -195,7 +195,7 @@ function showEndMessage() {
   endDiv.id = 'endMessage';
   endDiv.innerHTML = `
     <div style="font-size:2.5em;font-weight:bold;">🎉 Bravo, tu as terminé toutes les quêtes ! 🎉</div>
-    <div style="margin-top:18px;font-size:1.3em;">Merci d’avoir exploré Nice.<br>Tu peux recommencer ou fermer la page.</div>
+    <div style="margin-top:18px;font-size:1.3em;">Merci d’avoir exploré Nice.<br>Tu peux retourner à accueil.</div>
   `;
   Object.assign(endDiv.style, {
     position: 'fixed',
