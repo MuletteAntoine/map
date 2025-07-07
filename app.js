@@ -117,6 +117,11 @@ function updateBoussoles() {
 function updateQuests() {
   const questPanel = document.getElementById('questPanel');
   let html = '';
+  // Titre avec compteur de clés et emoji
+  html += `<div style="font-size:1.3em;font-weight:bold;margin-bottom:12px;">
+    Clés : ${Math.min(currentStep, parcours.length)} / ${parcours.length} 🔑
+  </div>`;
+  // Liste des quêtes
   for (let i = 0; i < parcours.length; i++) {
     let quest = parcours[i].questMessage;
     if (i < currentStep) {
@@ -127,8 +132,7 @@ function updateQuests() {
   }
   questPanel.innerHTML = html;
 }
-updateBoussoles();
-updateQuests();
+
 
 // --- Alertes personnalisées ---
 function showCustomAlert(msg) {
@@ -171,12 +175,11 @@ function startAnimation() {
     });
   }, 2500);
 }
-// --- Message de fin ---
 function showIntroMessage() {
   const intro = document.createElement('div');
   intro.id = 'introMessage';
   intro.innerHTML = `
-    <div style="font-size:2em;font-weight:bold;">Regardez les trois vidéos pour découvrir Nice en entier !</div>
+    <div style="font-size:2em;font-weight:bold;">Regardez les trois vidéos pour récupérer les trois clés afin de découvrir Nice en entier !</div>
     <div style="margin-top:10px;">Pour avancer, suivez la boussole rouge qui pointe sur la prochaine étape.</div>
   `;
   Object.assign(intro.style, {
@@ -187,8 +190,14 @@ function showIntroMessage() {
     zIndex: 20050, textAlign: 'center'
   });
   document.body.appendChild(intro);
-  setTimeout(() => { intro.remove(); }, 4500);
+  setTimeout(() => {
+    intro.remove();         // On retire le message
+    lampeActive = true;     // On active la lampe instantanément après
+    updateBoussoles();
+    updateQuests();
+  }, 7500); // 7,5 secondes
 }
+
 startAnimation();
 function showEndMessage() {
   const endDiv = document.createElement('div');
