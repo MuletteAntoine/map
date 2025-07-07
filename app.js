@@ -202,7 +202,7 @@ function showEndMessage() {
   endDiv.id = 'endMessage';
   endDiv.innerHTML = `
     <div style="font-size:2.5em;font-weight:bold;">Votre enquête à Nice s'achève</div>
-    <div style="margin-top:18px;font-size:1.3em;">Merci d’avoir exploré Nice.<br>Tu peux retourner à accueil.</div>
+    <div style="margin-top:18px;font-size:1.3em;">Merci d’avoir exploré Nice.<br>Vous pouvez retourner à accueil.</div>
   `;
   Object.assign(endDiv.style, {
     position: 'fixed',
