@@ -168,15 +168,11 @@ function startAnimation() {
       duration: 2.5,
       complete: () => {
         showIntroMessage();
-        setTimeout(() => {
-          lampeActive = true;
-          updateBoussoles();
-          updateQuests();
-        }, 7500);
       }
     });
   }, 2500);
 }
+
 function showIntroMessage() {
   const intro = document.createElement('div');
   intro.id = 'introMessage';
