@@ -14,6 +14,7 @@ const allPoints = [...parcours, ...secondaires];
 let currentStep = 0;
 let lampeActive = false;
 
+// --- Initialisation CesiumJS ---
 const viewer = new Cesium.Viewer('cesiumContainer', {
   terrainProvider: Cesium.createWorldTerrain(),
   imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
@@ -68,10 +69,7 @@ handler.setInputAction(function (click) {
   const entity = pickedObject.id;
   if (entity.isParcours && entity.idx === currentStep) {
     openVideoOverlay(parcours[currentStep].url);
-    currentStep++;
-    if (currentStep >= parcours.length) currentStep = parcours.length - 1;
-    updateBoussoles();
-    updateQuests();
+    // NE PAS incrémenter ici, mais à la fermeture de la vidéo
   } else {
     showCustomAlert(entity.pointData.message || "Ce lieu n'est pas accessible pour l’instant.");
   }
@@ -249,6 +247,12 @@ document.getElementById('closeVideo').onclick = function() {
   document.getElementById('videoOverlay').style.display = 'none';
   document.getElementById('videoIframe').src = '';
   document.body.style.overflow = '';
+  // Passe à l’étape suivante ici, après la vidéo
+  if (currentStep < parcours.length) {
+    currentStep++;
+    updateBoussoles();
+    updateQuests();
+  }
 };
 
 // --- Boutons UI ---
@@ -259,3 +263,4 @@ document.getElementById('btnFullscreen').onclick = () => {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen();
   else document.exitFullscreen();
 };
+
