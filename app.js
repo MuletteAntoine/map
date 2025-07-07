@@ -1,4 +1,4 @@
-// Mets ici ton vrai token Cesium
+// Mets ici ton vrai token Cesium (il est déjà le tien)
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNDM0ODlkOS0xMDU4LTQ0YjUtYjJiZi04ZGYzOGRlZTgyNDgiLCJpZCI6MzEwMDI4LCJpYXQiOjE3NDkyNzY5Nzh9.2jvKodQGEAxFbZN-bn5VCY-XdX3eCEHf8iD7FUEU3uc';
 
 let viewer;
@@ -266,5 +266,6 @@ drawLampeAndArrows();
 
 // --- Lancement ---
 initViewer();
+
 
 
