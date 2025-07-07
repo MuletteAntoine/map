@@ -6,9 +6,9 @@ const parcours = [
   { name: "Palais de Justice", position: Cesium.Cartesian3.fromDegrees(7.273762, 43.696633, 30), url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000541" }
 ];
 const secondaires = [
-  { name: "Maison des hauteurs", position: Cesium.Cartesian3.fromDegrees(7.27005, 43.72660, 80), message: "Pas de vidéo ici pour l’instant." },
-  { name: "Banque", position: Cesium.Cartesian3.fromDegrees(7.26945, 43.69912, 30), message: "Banque fermée pour audit annuel." },
-  { name: "Boutique photo", position: Cesium.Cartesian3.fromDegrees(7.223, 43.671, 30), message: "Le photographe est absent aujourd’hui." }
+  { name: "Maison des hauteurs", position: Cesium.Cartesian3.fromDegrees(7.27005, 43.72660, 80), message: "Les braqueurs s’y cachaient, mais la voisine nous a déjà alertés." },
+  { name: "Banque", position: Cesium.Cartesian3.fromDegrees(7.26945, 43.69912, 30), message: "Les braqueurs sont déjà passés, aucune trace ADN n’a été retrouvée." },
+  { name: "Boutique photo", position: Cesium.Cartesian3.fromDegrees(7.223, 43.671, 30), message: "Les braqueurs ont tenté d’y vendre un lingot d’or, mais le vendeur nous a déjà contactés." }
 ];
 const allPoints = [...parcours, ...secondaires];
 let currentStep = 0;
@@ -67,10 +67,20 @@ handler.setInputAction(function (click) {
   const pickedObject = viewer.scene.pick(click.position);
   if (!Cesium.defined(pickedObject) || !pickedObject.id) return;
   const entity = pickedObject.id;
-  if (entity.isParcours && entity.idx === currentStep) {
-    openVideoOverlay(parcours[currentStep].url);
-    // NE PAS incrémenter ici, mais à la fermeture de la vidéo
+
+  if (entity.isParcours) {
+    if (entity.idx === currentStep) {
+      // Étape en cours : on ouvre la vidéo
+      openVideoOverlay(parcours[currentStep].url);
+    } else if (entity.idx < currentStep) {
+      // Étape déjà faite
+      showCustomAlert("Vous êtes déjà passé par là.");
+    } else {
+      // Étape pas encore accessible
+      showCustomAlert("Ce lieu n'est pas accessible pour l'instant.");
+    }
   } else {
+    // Bâtiment secondaire : message personnalisé ou défaut
     showCustomAlert(entity.pointData.message || "Ce lieu n'est pas accessible pour l’instant.");
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
