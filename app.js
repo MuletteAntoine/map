@@ -14,9 +14,8 @@ const allPoints = [...parcours, ...secondaires];
 let currentStep = 0;
 let lampeActive = false;
 
-// --- Initialisation CesiumJS ---
 const viewer = new Cesium.Viewer('cesiumContainer', {
-  terrain: Cesium.Terrain.fromWorldTerrain(),
+  terrainProvider: Cesium.createWorldTerrain(),
   imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
   baseLayerPicker: false,
   sceneMode: Cesium.SceneMode.SCENE2D,
