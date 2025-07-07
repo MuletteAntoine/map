@@ -1,3 +1,4 @@
+// Mets ici ton vrai token Cesium
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNDM0ODlkOS0xMDU4LTQ0YjUtYjJiZi04ZGYzOGRlZTgyNDgiLCJpZCI6MzEwMDI4LCJpYXQiOjE3NDkyNzY5Nzh9.2jvKodQGEAxFbZN-bn5VCY-XdX3eCEHf8iD7FUEU3uc';
 
 let viewer;
@@ -17,9 +18,10 @@ const secondaires = [
 
 const allPoints = [...parcours, ...secondaires];
 
-async function initViewer() {
-  // Création du viewer SANS terrainProvider (pour CesiumJS 1.111+)
+// --- Initialisation CesiumJS ---
+function initViewer() {
   viewer = new Cesium.Viewer('cesiumContainer', {
+    terrain: Cesium.Terrain.fromWorldTerrain(),
     sceneMode: Cesium.SceneMode.SCENE2D,
     baseLayerPicker: false,
     timeline: false,
@@ -27,14 +29,6 @@ async function initViewer() {
     shouldAnimate: false,
     imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
   });
-
-  // Application du terrain asynchrone
-  try {
-    const terrain = await Cesium.createWorldTerrainAsync();
-    viewer.scene.setTerrain(terrain);
-  } catch (error) {
-    console.error("Erreur lors du chargement du terrain Cesium :", error);
-  }
 
   // Configuration caméra et contrôles
   viewer.scene.screenSpaceCameraController.enableZoom = true;
@@ -80,6 +74,7 @@ async function initViewer() {
   updateQuests();
 }
 
+// --- Fonctions de gestion des balises et quêtes ---
 function updateBoussoles() {
   viewer.entities.values.forEach((entity) => {
     if (!entity.billboard) return;
@@ -107,6 +102,7 @@ function updateQuests() {
   questPanel.innerHTML = html;
 }
 
+// --- Gestion des interactions (clics sur balises) ---
 function setupInteractions() {
   const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 
@@ -115,6 +111,7 @@ function setupInteractions() {
     if (!Cesium.defined(pickedObject) || !pickedObject.id) return;
     const entity = pickedObject.id;
     if (entity.isParcours && entity.idx === currentStep) {
+      // Ici tu peux déclencher l'affichage vidéo ou autre action
       window.parent.postMessage({ action: 'goToPage', page: entity.pointData.pandaPage }, '*');
       currentStep++;
       if (currentStep >= parcours.length) currentStep = parcours.length - 1;
@@ -135,6 +132,7 @@ function setupInteractions() {
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 }
 
+// --- Alertes personnalisées ---
 function showCustomAlert(msg) {
   const alertBox = document.getElementById("customAlertBox");
   const alertContent = document.getElementById("customAlertContent");
@@ -146,6 +144,7 @@ function hideCustomAlert() {
   document.getElementById("customAlertBox").style.display = "none";
 }
 
+// --- Animation d’intro ---
 function startAnimation() {
   viewer.camera.setView({ destination: Cesium.Rectangle.fromDegrees(-10, 35, 15, 55) });
   const niceText = document.createElement('div');
@@ -193,7 +192,7 @@ function showIntroMessage() {
   setTimeout(() => { intro.remove(); }, 4500);
 }
 
-// Lampe torche réaliste (canvas)
+// --- Lampe torche (canvas) ---
 const lampeCanvas = document.getElementById('lampeCanvas');
 const ctx = lampeCanvas.getContext('2d');
 function resizeCanvas() { lampeCanvas.width = window.innerWidth; lampeCanvas.height = window.innerHeight; }
@@ -265,6 +264,7 @@ function drawLampeAndArrows() {
 }
 drawLampeAndArrows();
 
+// --- Lancement ---
 initViewer();
 
 
