@@ -1,9 +1,25 @@
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNDM0ODlkOS0xMDU4LTQ0YjUtYjJiZi04ZGYzOGRlZTgyNDgiLCJpZCI6MzEwMDI4LCJpYXQiOjE3NDkyNzY5Nzh9.2jvKodQGEAxFbZN-bn5VCY-XdX3eCEHf8iD7FUEU3uc';
 
 const parcours = [
-  { name: "Commissariat", position: Cesium.Cartesian3.fromDegrees(7.287922, 43.7120523, 30), url: "https://viewer.pandasuite.com/Xgs22JPm?wid=53ce8bc9a1c90ba10004cd" },
-  { name: "Bergerie", position: Cesium.Cartesian3.fromDegrees(7.3, 43.726111, 30), url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000544" },
-  { name: "Palais de Justice", position: Cesium.Cartesian3.fromDegrees(7.273762, 43.696633, 30), url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000541" }
+  { 
+    name: "Commissariat", 
+    position: Cesium.Cartesian3.fromDegrees(7.287922, 43.7120523, 30), 
+    url: "https://viewer.pandasuite.com/Xgs22JPm?wid=53ce8bc9a1c90ba10004cd",
+    questMessage: "Aller au commissariat"
+  },
+  { 
+    name: "Bergerie", 
+    position: Cesium.Cartesian3.fromDegrees(7.3, 43.726111, 30), 
+    url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000544",
+    questMessage: "Aller à la bergerie"
+  },
+  { 
+    name: "Palais de Justice", 
+    position: Cesium.Cartesian3.fromDegrees(7.273762, 43.696633, 30), 
+    url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000541",
+    questMessage: "Aller au palais de justice"
+  }
+
 ];
 const secondaires = [
   { name: "Maison des hauteurs", position: Cesium.Cartesian3.fromDegrees(7.27005, 43.72660, 80), message: "Les braqueurs s’y cachaient, mais la voisine nous a déjà alertés." },
