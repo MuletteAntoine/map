@@ -117,9 +117,11 @@ function updateBoussoles() {
 function updateQuests() {
   const questPanel = document.getElementById('questPanel');
   let html = '';
-  // Titre avec compteur de clés et emoji
+  const nbCles = Math.min(currentStep, parcours.length);
+  const pluriel = nbCles > 1 ? 's' : '';
+  // Titre avec compteur de clés et emoji, accord automatique
   html += `<div style="font-size:1.3em;font-weight:bold;margin-bottom:12px;">
-    Clés : ${Math.min(currentStep, parcours.length)} / ${parcours.length} 🔑
+    Clé${pluriel} : ${nbCles} / ${parcours.length} 🔑
   </div>`;
   // Liste des quêtes
   for (let i = 0; i < parcours.length; i++) {
