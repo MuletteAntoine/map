@@ -1,80 +1,84 @@
-// Mets ici ton vrai token Cesium (il est déjà le tien)
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNDM0ODlkOS0xMDU4LTQ0YjUtYjJiZi04ZGYzOGRlZTgyNDgiLCJpZCI6MzEwMDI4LCJpYXQiOjE3NDkyNzY5Nzh9.2jvKodQGEAxFbZN-bn5VCY-XdX3eCEHf8iD7FUEU3uc';
 
-let viewer;
-let currentStep = 0;
-let lampeActive = false;
-
 const parcours = [
-  { name: "Commissariat", position: Cesium.Cartesian3.fromDegrees(7.287922, 43.7120523, 30), pandaPage: "VideoCommissariat" },
-  { name: "Bergerie", position: Cesium.Cartesian3.fromDegrees(7.3, 43.726111, 30), pandaPage: "VideoBergerie" },
-  { name: "Palais de Justice", position: Cesium.Cartesian3.fromDegrees(7.273762, 43.696633, 30), pandaPage: "VideoPalaisJustice" }
+  { name: "Commissariat", position: Cesium.Cartesian3.fromDegrees(7.287922, 43.7120523, 30), url: "https://viewer.pandasuite.com/Xgs22JPm?wid=53ce8bc9a1c90ba10004cd" },
+  { name: "Bergerie", position: Cesium.Cartesian3.fromDegrees(7.3, 43.726111, 30), url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000544" },
+  { name: "Palais de Justice", position: Cesium.Cartesian3.fromDegrees(7.273762, 43.696633, 30), url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000541" }
 ];
 const secondaires = [
   { name: "Maison des hauteurs", position: Cesium.Cartesian3.fromDegrees(7.27005, 43.72660, 80), message: "Pas de vidéo ici pour l’instant." },
-  { name: "Banque", position: Cesium.Cartesian3.fromDegrees(7.26945, 43.69912, 30), message: "Rendez-vous d’abord au Commissariat !" },
-  { name: "Boutique photo", position: Cesium.Cartesian3.fromDegrees(7.223, 43.671, 30), message: "Ce lieu sera accessible plus tard." }
+  { name: "Banque", position: Cesium.Cartesian3.fromDegrees(7.26945, 43.69912, 30), message: "Banque fermée pour audit annuel." },
+  { name: "Boutique photo", position: Cesium.Cartesian3.fromDegrees(7.223, 43.671, 30), message: "Le photographe est absent aujourd’hui." }
 ];
-
 const allPoints = [...parcours, ...secondaires];
+let currentStep = 0;
+let lampeActive = false;
 
 // --- Initialisation CesiumJS ---
-function initViewer() {
-  viewer = new Cesium.Viewer('cesiumContainer', {
-    terrain: Cesium.Terrain.fromWorldTerrain(),
-    sceneMode: Cesium.SceneMode.SCENE2D,
-    baseLayerPicker: false,
-    timeline: false,
-    animation: false,
-    shouldAnimate: false,
-    imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
+const viewer = new Cesium.Viewer('cesiumContainer', {
+  terrain: Cesium.Terrain.fromWorldTerrain(),
+  imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
+  baseLayerPicker: false,
+  sceneMode: Cesium.SceneMode.SCENE2D,
+  timeline: false,
+  animation: false,
+  shouldAnimate: false,
+});
+viewer.scene.screenSpaceCameraController.enableZoom = true;
+viewer.scene.screenSpaceCameraController.enableRotate = false;
+viewer.scene.screenSpaceCameraController.enableTilt = false;
+viewer.scene.screenSpaceCameraController.enableLook = false;
+viewer.scene.screenSpaceCameraController.enableTranslate = true;
+viewer.scene.screenSpaceCameraController.inertiaSpin = 0;
+viewer.scene.screenSpaceCameraController.inertiaZoom = 0;
+viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+viewer.selectedEntityChanged.addEventListener(() => { viewer.selectedEntity = undefined; });
+
+// --- Ajout des entités (balises) ---
+allPoints.forEach((point, idx) => {
+  let isParcours = idx < parcours.length;
+  let entity = viewer.entities.add({
+    position: point.position,
+    billboard: {
+      image: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+      scale: 0.06,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      color: isParcours && idx === currentStep ? Cesium.Color.RED : Cesium.Color.GRAY.withAlpha(0.7)
+    },
+    label: {
+      text: point.name,
+      font: '14pt monospace',
+      fillColor: Cesium.Color.WHITE,
+      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      outlineWidth: 2,
+      verticalOrigin: Cesium.VerticalOrigin.TOP,
+      pixelOffset: new Cesium.Cartesian2(0, -40)
+    }
   });
+  entity.idx = idx;
+  entity.isParcours = isParcours;
+  entity.pointData = point;
+});
 
-  // Configuration caméra et contrôles
-  viewer.scene.screenSpaceCameraController.enableZoom = true;
-  viewer.scene.screenSpaceCameraController.enableRotate = false;
-  viewer.scene.screenSpaceCameraController.enableTilt = false;
-  viewer.scene.screenSpaceCameraController.enableLook = false;
-  viewer.scene.screenSpaceCameraController.enableTranslate = true;
-  viewer.scene.screenSpaceCameraController.inertiaSpin = 0;
-  viewer.scene.screenSpaceCameraController.inertiaZoom = 0;
-  viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
-  viewer.selectedEntityChanged.addEventListener(() => { viewer.selectedEntity = undefined; });
+// --- Interactions ---
+const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+handler.setInputAction(function (click) {
+  const pickedObject = viewer.scene.pick(click.position);
+  if (!Cesium.defined(pickedObject) || !pickedObject.id) return;
+  const entity = pickedObject.id;
+  if (entity.isParcours && entity.idx === currentStep) {
+    openVideoOverlay(parcours[currentStep].url);
+    currentStep++;
+    if (currentStep >= parcours.length) currentStep = parcours.length - 1;
+    updateBoussoles();
+    updateQuests();
+  } else {
+    showCustomAlert(entity.pointData.message || "Ce lieu n'est pas accessible pour l’instant.");
+  }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
-  // Ajout des entités (balises)
-  allPoints.forEach((point, idx) => {
-    let isParcours = idx < parcours.length;
-    let entity = viewer.entities.add({
-      position: point.position,
-      billboard: {
-        image: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        scale: 0.06,
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
-        color: isParcours && idx === currentStep ? Cesium.Color.RED : Cesium.Color.GRAY.withAlpha(0.7)
-      },
-      label: {
-        text: point.name,
-        font: '14pt monospace',
-        fillColor: Cesium.Color.WHITE,
-        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        outlineWidth: 2,
-        verticalOrigin: Cesium.VerticalOrigin.TOP,
-        pixelOffset: new Cesium.Cartesian2(0, -40)
-      }
-    });
-    entity.idx = idx;
-    entity.isParcours = isParcours;
-    entity.pointData = point;
-  });
-
-  setupInteractions();
-  startAnimation();
-  updateBoussoles();
-  updateQuests();
-}
-
-// --- Fonctions de gestion des balises et quêtes ---
+// --- Boussoles et quêtes ---
 function updateBoussoles() {
   viewer.entities.values.forEach((entity) => {
     if (!entity.billboard) return;
@@ -87,7 +91,6 @@ function updateBoussoles() {
     }
   });
 }
-
 function updateQuests() {
   const questPanel = document.getElementById('questPanel');
   let html = '';
@@ -101,36 +104,8 @@ function updateQuests() {
   }
   questPanel.innerHTML = html;
 }
-
-// --- Gestion des interactions (clics sur balises) ---
-function setupInteractions() {
-  const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-
-  handler.setInputAction(function (click) {
-    const pickedObject = viewer.scene.pick(click.position);
-    if (!Cesium.defined(pickedObject) || !pickedObject.id) return;
-    const entity = pickedObject.id;
-    if (entity.isParcours && entity.idx === currentStep) {
-      // Ici tu peux déclencher l'affichage vidéo ou autre action
-      window.parent.postMessage({ action: 'goToPage', page: entity.pointData.pandaPage }, '*');
-      currentStep++;
-      if (currentStep >= parcours.length) currentStep = parcours.length - 1;
-      updateBoussoles();
-      updateQuests();
-    } else {
-      showCustomAlert(entity.pointData.message || "Ce lieu n'est pas accessible pour l’instant.");
-    }
-  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-  handler.setInputAction(function (movement) {
-    const pickedObject = viewer.scene.pick(movement.endPosition);
-    if (Cesium.defined(pickedObject) && pickedObject.id && (!pickedObject.id.isParcours || pickedObject.id.idx !== currentStep)) {
-      showCustomAlert(pickedObject.id.pointData.message || "Ce lieu n'est pas accessible pour l’instant.");
-    } else {
-      hideCustomAlert();
-    }
-  }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-}
+updateBoussoles();
+updateQuests();
 
 // --- Alertes personnalisées ---
 function showCustomAlert(msg) {
@@ -173,7 +148,6 @@ function startAnimation() {
     });
   }, 2500);
 }
-
 function showIntroMessage() {
   const intro = document.createElement('div');
   intro.id = 'introMessage';
@@ -191,6 +165,7 @@ function showIntroMessage() {
   document.body.appendChild(intro);
   setTimeout(() => { intro.remove(); }, 4500);
 }
+startAnimation();
 
 // --- Lampe torche (canvas) ---
 const lampeCanvas = document.getElementById('lampeCanvas');
@@ -205,7 +180,6 @@ function isPointInLamp(screenPosition) {
   const dx = screenPosition.x - centerX, dy = screenPosition.y - centerY;
   return (dx * dx + dy * dy) <= (radius * radius);
 }
-
 function drawLampeAndArrows() {
   if (!lampeActive) {
     ctx.clearRect(0, 0, lampeCanvas.width, lampeCanvas.height);
@@ -264,8 +238,25 @@ function drawLampeAndArrows() {
 }
 drawLampeAndArrows();
 
-// --- Lancement ---
-initViewer();
+// --- Vidéo overlay ---
+function openVideoOverlay(url) {
+  const overlay = document.getElementById('videoOverlay');
+  const iframe = document.getElementById('videoIframe');
+  overlay.style.display = 'flex';
+  iframe.src = url;
+  document.body.style.overflow = 'hidden';
+}
+document.getElementById('closeVideo').onclick = function() {
+  document.getElementById('videoOverlay').style.display = 'none';
+  document.getElementById('videoIframe').src = '';
+  document.body.style.overflow = '';
+};
 
-
-
+// --- Boutons UI ---
+document.getElementById('btnRecenter').onclick = () => {
+  viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(7.265252, 43.7102, 2000), duration: 2.5 });
+};
+document.getElementById('btnFullscreen').onclick = () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+};
