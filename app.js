@@ -10,13 +10,13 @@ const parcours = [
   { 
     name: "Bergerie", 
     position: Cesium.Cartesian3.fromDegrees(7.3, 43.726111, 30), 
-    url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000544",
+    url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000541",
     questMessage: "Aller à la bergerie"
   },
   { 
     name: "Palais de Justice", 
     position: Cesium.Cartesian3.fromDegrees(7.273762, 43.696633, 30), 
-    url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000541",
+    url: "https://viewer.pandasuite.com/Xgs22JPm?wid=6542e888449f7cc8000544",
     questMessage: "Aller au palais de justice"
   }
 
